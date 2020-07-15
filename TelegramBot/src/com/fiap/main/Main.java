@@ -3,6 +3,8 @@ package com.fiap.main;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import com.fiap.comandos.Ajuda;
+import com.fiap.comandos.Tempo;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.model.Update;
@@ -21,13 +23,12 @@ public class Main {
 		// Criação do objeto bot com as informações de acesso
 		TelegramBot bot = TelegramBotAdapter.build("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
 		String mensagem;
-		final String regex = "^\\/+";
-		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+		String localizacao;
 
 		// objeto responsável por receber as mensagens
 		GetUpdatesResponse updatesResponse;
 		// objeto responsável por gerenciar o envio de respostas
-		SendResponse sendResponse;
+		SendResponse sendResponse = null;
 		// objeto responsável por gerenciar o envio de ações do chat
 		BaseResponse baseResponse;
 
@@ -55,22 +56,60 @@ public class Main {
 				// envio de "Escrevendo" antes de enviar a resposta
 				baseResponse = bot.execute(new SendChatAction(update.message().chat().id(), ChatAction.typing.name()));
 
-//				regular expressions para identificar um comando
-				if (pattern.matcher(mensagem).find()) {
-					sendResponse = bot
-							.execute(new SendMessage(update.message().chat().id(), "Voc� digitou um comando"));
+				if (mensagem != null) {
+					verificaMensagem(mensagem, sendResponse, bot, update);
+
 				} else {
-					sendResponse = bot.execute(new SendMessage(update.message().chat().id(), "Bem vindo "
-							+ update.message().from().firstName() + " " + update.message().from().lastName()));
-
-					sendResponse = bot.execute(new SendMessage(update.message().chat().id(),
-							"digite /ajuda para obter a lista de comandos conhecidos."));
-					break;
-
+					
+					if(update.message().location() == null) {
+						bemVindo(sendResponse, bot, update);
+					}else {
+						Tempo.solicitarLocalizacao(sendResponse, bot, update);
+					}
+					
+					
 				}
 
 			}
 
+		}
+
+	}
+
+	private static void bemVindo(SendResponse sendResponse, TelegramBot bot, Update update) {
+		sendResponse = bot.execute(new SendMessage(update.message().chat().id(),
+				"Bem vindo " + update.message().from().firstName() + " " + update.message().from().lastName()));
+
+		sendResponse = bot.execute(new SendMessage(update.message().chat().id(),
+				"digite /ajuda para obter a lista de comandos conhecidos."));
+
+	}
+
+	private static void verificaMensagem(String mensagem, SendResponse sendResponse, TelegramBot bot, Update update) {
+		final String regex = "^\\/+";
+		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+
+//		regular expressions para identificar um comando
+		if (pattern.matcher(mensagem).find()) {
+
+//			Verifca o comando informado
+			switch (mensagem) {
+
+			case "/ajuda":
+				Ajuda.listarComandos(sendResponse, bot, update);
+				break;
+
+			case "/tempo":
+				Tempo.solicitarLocalizacao(sendResponse, bot, update);
+				break;
+
+			default:
+				Ajuda.comandoInvalido(sendResponse, bot, update);
+				break;
+			}
+
+		} else {
+			bemVindo(sendResponse, bot, update);
 		}
 
 	}
