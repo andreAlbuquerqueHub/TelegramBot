@@ -21,6 +21,7 @@ public class Main {
 	public static void main(String[] args) {
 
 		// Criação do objeto bot com as informações de acesso
+		// link para chat do bot criado https://t.me/FIAP36SCJBot
 		TelegramBot bot = TelegramBotAdapter.build("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
 		String mensagem;
 		String localizacao;
