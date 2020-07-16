@@ -2,11 +2,9 @@ package com.fiap.main;
 
 import java.util.List;
 import java.util.regex.Pattern;
-
 import com.fiap.comandos.Ajuda;
 import com.fiap.comandos.Tempo;
 import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.TelegramBotAdapter;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.request.GetUpdates;
@@ -22,7 +20,7 @@ public class Main {
 
 		// Criação do objeto bot com as informações de acesso
 		// link para chat do bot criado https://t.me/FIAP36SCJBot
-		TelegramBot bot = TelegramBotAdapter.build("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
+		TelegramBot bot = new TelegramBot("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
 		String mensagem;
 
 		// objeto responsável por receber as mensagens

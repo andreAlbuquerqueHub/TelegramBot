@@ -7,8 +7,8 @@ import com.google.gson.JsonParser;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.KeyboardButton;
-import com.pengrad.telegrambot.model.request.ReplyKeyboardHide;
 import com.pengrad.telegrambot.model.request.ReplyKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ReplyKeyboardRemove;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.SendResponse;
 import jakarta.ws.rs.client.Client;
@@ -32,18 +32,16 @@ public class Tempo {
 	public static void solicitarLocalizacao(SendResponse sendResponse, TelegramBot bot, Update update) {
 
 		if (update.message().location() == null) {
-			
-//			Enviar mensagem para esconder o teclado
-//			Necessario efetuar esse comando para exibir o botao de localização
-			sendResponse = bot.execute(new SendMessage(update.message().chat().id(), "")
-					.replyMarkup(new ReplyKeyboardHide() ) );
-			
+
 			sendResponse = bot.execute(new SendMessage(update.message().chat().id(), "Compartilhar localização?")
 					.replyMarkup(new ReplyKeyboardMarkup(
 							new KeyboardButton[] { new KeyboardButton("localização").requestLocation(true) })
 									.resizeKeyboard(true).selective(true).oneTimeKeyboard(true)));
 		} else {
-			sendResponse = bot.execute(new SendMessage(update.message().chat().id(), mostrarPrevisao(update)));
+			
+//			Retorna a temperatura da localização e remove o botão de "localização"
+			sendResponse = bot.execute(new SendMessage(update.message().chat().id(), mostrarPrevisao(update))
+					.replyMarkup(new ReplyKeyboardRemove(true)) );
 		}
 
 	}
@@ -80,7 +78,7 @@ public class Tempo {
 			localizacao = localizacao.replace("\"", "");
 
 			return "Temperatura em " + localizacao +
-				   " de  " + temperatura + "°C";
+				   " de " + temperatura + "°C";
 		} else {
 
 			return "Não foi possivel determinar a temperatura";
