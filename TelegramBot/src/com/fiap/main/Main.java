@@ -24,7 +24,6 @@ public class Main {
 		// link para chat do bot criado https://t.me/FIAP36SCJBot
 		TelegramBot bot = TelegramBotAdapter.build("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
 		String mensagem;
-		String localizacao;
 
 		// objeto responsável por receber as mensagens
 		GetUpdatesResponse updatesResponse;
@@ -47,6 +46,10 @@ public class Main {
 			// lista de mensagens
 			List<Update> updates = updatesResponse.updates();
 
+			if(updates == null) {
+				continue;
+			}
+			
 			// análise de cada ação da mensagem
 			for (Update update : updates) {
 
@@ -62,13 +65,13 @@ public class Main {
 
 				} else {
 					
-					if(update.message().location() == null) {
+//					Caso o usuario compartilhe a localizacao o retorno ser� a temperatura do local
+					if (update.message().location() == null) {
 						bemVindo(sendResponse, bot, update);
-					}else {
+					} else {
 						Tempo.solicitarLocalizacao(sendResponse, bot, update);
 					}
-					
-					
+
 				}
 
 			}

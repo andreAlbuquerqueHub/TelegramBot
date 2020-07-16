@@ -21,7 +21,7 @@ public class Ajuda {
 		sendResponse = bot
 				.execute(new SendMessage(update.message().chat().id(),
 						"Digite um dos comandos: \n"
-						+ "Previsão do tempo /tempo \n"
+						+ "Temperatura /tempo \n"
 					    + "Listar comandos /ajuda"));
 		
 	}
