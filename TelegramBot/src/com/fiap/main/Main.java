@@ -105,6 +105,10 @@ public class Main {
 				Tempo.solicitarLocalizacao(sendResponse, bot, update);
 				break;
 
+			case "/previsao":
+				Tempo.solicitarLocalizacao(sendResponse, bot, update);
+				break;
+				
 			default:
 				Ajuda.comandoInvalido(sendResponse, bot, update);
 				break;
