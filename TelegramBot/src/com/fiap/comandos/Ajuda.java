@@ -11,6 +11,11 @@ import com.pengrad.telegrambot.response.SendResponse;
  */
 public class Ajuda {
 
+	
+	public static final String previsao = "/previsao";
+	public static final String tempo = "/tempo";
+	public static final String ajuda = "/ajuda";
+	
 	/**
 	 * @param sendResponse
 	 * @param bot

@@ -20,10 +20,10 @@ import jakarta.ws.rs.core.MediaType;
  * Classe responsavel por tratar solitações de previsão do tempo
  */
 public class Tempo {
-	
+
 	private static ClientConfig config = new ClientConfig();
 	private static Client client = ClientBuilder.newClient(config);
-	
+
 	/**
 	 * Solicita a localização em tempo real do usuario
 	 * 
@@ -31,8 +31,9 @@ public class Tempo {
 	 * @param sendResponse
 	 * @param bot
 	 * @param update
+	 * @param comando
 	 */
-	public static void solicitarLocalizacao(SendResponse sendResponse, TelegramBot bot, Update update) {
+	public static String solicitarLocalizacao(SendResponse sendResponse, TelegramBot bot, Update update, String comando) {
 
 		if (update.message().location() == null) {
 
@@ -40,11 +41,20 @@ public class Tempo {
 					.replyMarkup(new ReplyKeyboardMarkup(
 							new KeyboardButton[] { new KeyboardButton("localização").requestLocation(true) })
 									.resizeKeyboard(true).selective(true).oneTimeKeyboard(true)));
-		} else {
 			
-//			Retorna a temperatura da localização e remove o botão de "localização"
-			sendResponse = bot.execute(new SendMessage(update.message().chat().id(), mostrarPrevisao(update))
-					.replyMarkup(new ReplyKeyboardRemove(true)) );
+			return comando;
+		} else {
+
+			if (comando.equals(Ajuda.tempo)) {
+//				Retorna a temperatura da localização e remove o botão de "localização"
+				sendResponse = bot.execute(new SendMessage(update.message().chat().id(), mostrarTemperatura(update))
+						.replyMarkup(new ReplyKeyboardRemove(true)));
+			}else {
+				sendResponse = bot.execute(new SendMessage(update.message().chat().id(), "Você solicitou a previsão do tempo")
+						.replyMarkup(new ReplyKeyboardRemove(true)));
+			}
+			
+			return "";
 		}
 
 	}
@@ -56,16 +66,14 @@ public class Tempo {
 	 * @param update
 	 * @return
 	 */
-	private static String mostrarPrevisao(Update update) {
+	private static String mostrarTemperatura(Update update) {
 
 //		Chama API para buscar a temperatura atual de acordo com as coordenadas
 
 		WebTarget target = client.target("https://api.openweathermap.org/data/2.5/onecall")
 				.queryParam("lat", update.message().location().latitude())
-				.queryParam("lon", update.message().location().longitude())
-				.queryParam("units", "metric")
-				.queryParam("exclude", "hourly,daily")
-				.queryParam("appid", "fa74962721a7d31feb9acf98ff23d2b6");
+				.queryParam("lon", update.message().location().longitude()).queryParam("units", "metric")
+				.queryParam("exclude", "hourly,daily").queryParam("appid", "fa74962721a7d31feb9acf98ff23d2b6");
 
 		String responseString = target.request(MediaType.APPLICATION_JSON).get(String.class);
 
@@ -81,8 +89,7 @@ public class Tempo {
 			localizacao = localizacao.replace("_", " ");
 			localizacao = localizacao.replace("\"", "");
 
-			return "Temperatura em " + localizacao +
-				   " de " + temperatura + "°C";
+			return "Temperatura em " + localizacao + " de " + temperatura + "°C";
 		} else {
 
 			return "Não foi possivel determinar a temperatura";
