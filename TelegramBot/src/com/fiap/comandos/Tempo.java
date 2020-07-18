@@ -20,7 +20,10 @@ import jakarta.ws.rs.core.MediaType;
  * Classe responsavel por tratar solitações de previsão do tempo
  */
 public class Tempo {
-
+	
+	private static ClientConfig config = new ClientConfig();
+	private static Client client = ClientBuilder.newClient(config);
+	
 	/**
 	 * Solicita a localização em tempo real do usuario
 	 * 
@@ -56,11 +59,12 @@ public class Tempo {
 	private static String mostrarPrevisao(Update update) {
 
 //		Chama API para buscar a temperatura atual de acordo com as coordenadas
-		ClientConfig config = new ClientConfig();
-		Client client = ClientBuilder.newClient(config);
+
 		WebTarget target = client.target("https://api.openweathermap.org/data/2.5/onecall")
 				.queryParam("lat", update.message().location().latitude())
-				.queryParam("lon", update.message().location().longitude()).queryParam("units", "metric")
+				.queryParam("lon", update.message().location().longitude())
+				.queryParam("units", "metric")
+				.queryParam("exclude", "hourly,daily")
 				.queryParam("appid", "fa74962721a7d31feb9acf98ff23d2b6");
 
 		String responseString = target.request(MediaType.APPLICATION_JSON).get(String.class);

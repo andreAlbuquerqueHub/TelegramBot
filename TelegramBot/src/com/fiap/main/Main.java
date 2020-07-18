@@ -1,7 +1,12 @@
 package com.fiap.main;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
+import com.fiap.chatControl.ChatControl;
 import com.fiap.comandos.Ajuda;
 import com.fiap.comandos.Tempo;
 import com.pengrad.telegrambot.TelegramBot;
@@ -16,13 +21,18 @@ import com.pengrad.telegrambot.response.SendResponse;
 
 public class Main {
 
+	// Criação do objeto bot com as informações de acesso
+	// link para chat do bot criado https://t.me/FIAP36SCJBot
+	private static TelegramBot bot = new TelegramBot("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
+	static String mensagem;
+	static List<ChatControl> listChatControl = new ArrayList<ChatControl>();
+	static ChatControl chatControl = new ChatControl();
+
+
 	public static void main(String[] args) {
-
-		// Criação do objeto bot com as informações de acesso
-		// link para chat do bot criado https://t.me/FIAP36SCJBot
-		TelegramBot bot = new TelegramBot("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
-		String mensagem;
-
+		int index;
+		List<ChatControl> filter;
+		
 		// objeto responsável por receber as mensagens
 		GetUpdatesResponse updatesResponse;
 		// objeto responsável por gerenciar o envio de respostas
@@ -44,10 +54,10 @@ public class Main {
 			// lista de mensagens
 			List<Update> updates = updatesResponse.updates();
 
-			if(updates == null) {
+			if (updates == null) {
 				continue;
 			}
-			
+
 			// análise de cada ação da mensagem
 			for (Update update : updates) {
 
@@ -55,6 +65,26 @@ public class Main {
 				m = update.updateId() + 1;
 
 				mensagem = update.message().text();
+
+//				Controla mensagens enviadas do usuario
+//				Valida se o registro j� existe
+				filter = listChatControl.stream().filter(item -> item.getChatId().equals(update.message().chat().id()))
+						.collect(Collectors.toList());
+
+				if (filter.isEmpty() == false) {
+					chatControl = filter.get(0);
+					index = listChatControl.indexOf(chatControl);
+					System.out.println(chatControl.getUltima_mensagem());
+					chatControl.setData_mensagem(LocalDate.now());
+					chatControl.setUltima_mensagem(mensagem);
+					listChatControl.set(index, chatControl);
+				} else {
+					chatControl.setChatId(update.message().chat().id());
+					chatControl.setData_mensagem(LocalDate.now());
+					chatControl.setUltima_mensagem(mensagem);
+					listChatControl.add(chatControl);
+				}
+
 				// envio de "Escrevendo" antes de enviar a resposta
 				baseResponse = bot.execute(new SendChatAction(update.message().chat().id(), ChatAction.typing.name()));
 
@@ -62,7 +92,7 @@ public class Main {
 					verificaMensagem(mensagem, sendResponse, bot, update);
 
 				} else {
-					
+
 //					Caso o usuario compartilhe a localizacao o retorno ser� a temperatura do local
 					if (update.message().location() == null) {
 						bemVindo(sendResponse, bot, update);
@@ -108,7 +138,7 @@ public class Main {
 			case "/previsao":
 				Tempo.solicitarLocalizacao(sendResponse, bot, update);
 				break;
-				
+
 			default:
 				Ajuda.comandoInvalido(sendResponse, bot, update);
 				break;
