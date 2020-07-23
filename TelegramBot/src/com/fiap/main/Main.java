@@ -1,13 +1,9 @@
 package com.fiap.main;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import org.glassfish.hk2.internal.ConstantActiveDescriptor;
-
 import com.fiap.chatControl.ChatControl;
 import com.fiap.comandos.Ajuda;
 import com.fiap.comandos.Tempo;
@@ -53,10 +49,18 @@ public class Main {
 
 			// lista de mensagens
 			List<Update> updates = updatesResponse.updates();
+			
+			
+//			Controla mensagens antigas, remove mensagens com mais de 40 segundos
+			if(listChatControl.isEmpty() == false) {
+				listChatControl = ChatControl.remove(listChatControl);
+			}
+			
 
 			if (updates == null) {
 				continue;
 			}
+			
 
 			// análise de cada ação da mensagem
 			for (Update update : updates) {
@@ -99,7 +103,7 @@ public class Main {
 		case Ajuda.previsao:
 			mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
 			break;
-			
+
 		default:
 			bemVindo(sendResponse, bot, update);
 		}
