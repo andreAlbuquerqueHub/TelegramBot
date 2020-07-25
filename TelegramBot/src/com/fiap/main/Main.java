@@ -1,7 +1,10 @@
 package com.fiap.main;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import com.fiap.chatControl.ChatControl;
 import com.fiap.comandos.Ajuda;
 import com.fiap.comandos.Tempo;
 import com.pengrad.telegrambot.TelegramBot;
@@ -16,12 +19,15 @@ import com.pengrad.telegrambot.response.SendResponse;
 
 public class Main {
 
-	public static void main(String[] args) {
+	// Criação do objeto bot com as informações de acesso
+	// link para chat do bot criado https://t.me/FIAP36SCJBot
+	private static final TelegramBot bot = new TelegramBot("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
+	static String mensagem;
+	static Long chatId;
+	static List<ChatControl> listChatControl = new ArrayList<ChatControl>();
+	static ChatControl chatControl;
 
-		// Criação do objeto bot com as informações de acesso
-		// link para chat do bot criado https://t.me/FIAP36SCJBot
-		TelegramBot bot = new TelegramBot("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
-		String mensagem;
+	public static void main(String[] args) {
 
 		// objeto responsável por receber as mensagens
 		GetUpdatesResponse updatesResponse;
@@ -43,11 +49,19 @@ public class Main {
 
 			// lista de mensagens
 			List<Update> updates = updatesResponse.updates();
+			
+			
+//			Controla mensagens antigas, remove mensagens com mais de 40 segundos
+			if(listChatControl.isEmpty() == false) {
+				listChatControl = ChatControl.remove(listChatControl);
+			}
+			
 
-			if(updates == null) {
+			if (updates == null) {
 				continue;
 			}
 			
+
 			// análise de cada ação da mensagem
 			for (Update update : updates) {
 
@@ -55,22 +69,12 @@ public class Main {
 				m = update.updateId() + 1;
 
 				mensagem = update.message().text();
+				chatId = update.message().chat().id();
+
 				// envio de "Escrevendo" antes de enviar a resposta
-				baseResponse = bot.execute(new SendChatAction(update.message().chat().id(), ChatAction.typing.name()));
+				baseResponse = bot.execute(new SendChatAction(chatId, ChatAction.typing.name()));
 
-				if (mensagem != null) {
-					verificaMensagem(mensagem, sendResponse, bot, update);
-
-				} else {
-					
-//					Caso o usuario compartilhe a localizacao o retorno ser� a temperatura do local
-					if (update.message().location() == null) {
-						bemVindo(sendResponse, bot, update);
-					} else {
-						Tempo.solicitarLocalizacao(sendResponse, bot, update);
-					}
-
-				}
+				verificaMensagem(mensagem, sendResponse, bot, update);
 
 			}
 
@@ -78,6 +82,45 @@ public class Main {
 
 	}
 
+	private static void verificaUltimaMensagem(SendResponse sendResponse, TelegramBot bot2, Update update) {
+		// TODO Auto-generated method stub
+
+		// Seleciona na lista a ultima mensagem para o ID em processamento
+		int index = listChatControl.indexOf(chatControl);
+		String ultimaMensagem = chatControl.getUltima_mensagem();
+
+		if (ultimaMensagem == null) {
+			bemVindo(sendResponse, bot, update);
+			return;
+		}
+
+		switch (ultimaMensagem) {
+
+		case Ajuda.tempo:
+			mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
+			break;
+
+		case Ajuda.previsao:
+			mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
+			break;
+
+		default:
+			bemVindo(sendResponse, bot, update);
+		}
+
+//		Atualiza chat ID com nova mensagem
+		chatControl = new ChatControl(chatId, mensagem);
+		listChatControl.set(index, chatControl);
+
+	}
+
+	/**
+	 * Envia mensagem default de bem vindo
+	 * 
+	 * @param sendResponse
+	 * @param bot
+	 * @param update
+	 */
 	private static void bemVindo(SendResponse sendResponse, TelegramBot bot, Update update) {
 		sendResponse = bot.execute(new SendMessage(update.message().chat().id(),
 				"Bem vindo " + update.message().from().firstName() + " " + update.message().from().lastName()));
@@ -87,22 +130,51 @@ public class Main {
 
 	}
 
+	/**
+	 * Verifica mensagem enviada
+	 * 
+	 * @param mensagem
+	 * @param sendResponse
+	 * @param bot
+	 * @param update
+	 */
 	private static void verificaMensagem(String mensagem, SendResponse sendResponse, TelegramBot bot, Update update) {
 		final String regex = "^\\/+";
 		Pattern pattern = Pattern.compile(regex, Pattern.MULTILINE);
+		List<ChatControl> filter;
+
+//		Controla mensagens enviadas do usuario
+//		Valida se o registro j� existe
+		filter = listChatControl.stream().filter(item -> item.getChatId().equals(update.message().chat().id()))
+				.collect(Collectors.toList());
+		if (filter.isEmpty() == false) {
+			chatControl = filter.get(0);
+		}
 
 //		regular expressions para identificar um comando
-		if (pattern.matcher(mensagem).find()) {
+		if (mensagem != null && pattern.matcher(mensagem).find()) {
+
+//			Quando executa um comando nao precisa verificar a ultima mensagem
+//			portantano basta atualizar a lista de controle
+			if (chatControl != null) {
+				listChatControl.set(listChatControl.indexOf(chatControl), new ChatControl(chatId, mensagem));
+			} else {
+				listChatControl.add(new ChatControl(chatId, mensagem));
+			}
 
 //			Verifca o comando informado
 			switch (mensagem) {
 
-			case "/ajuda":
+			case Ajuda.ajuda:
 				Ajuda.listarComandos(sendResponse, bot, update);
 				break;
 
-			case "/tempo":
-				Tempo.solicitarLocalizacao(sendResponse, bot, update);
+			case Ajuda.tempo:
+				Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
+				break;
+
+			case Ajuda.previsao:
+				Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
 				break;
 
 			default:
@@ -111,7 +183,18 @@ public class Main {
 			}
 
 		} else {
-			bemVindo(sendResponse, bot, update);
+
+			if (filter.isEmpty() == false) {
+
+				verificaUltimaMensagem(sendResponse, bot, update);
+
+			} else {
+
+				listChatControl.add(new ChatControl(chatId, mensagem));
+				bemVindo(sendResponse, bot, update);
+
+			}
+
 		}
 
 	}

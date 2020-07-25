@@ -11,6 +11,11 @@ import com.pengrad.telegrambot.response.SendResponse;
  */
 public class Ajuda {
 
+	
+	public static final String previsao = "/previsao";
+	public static final String tempo = "/tempo";
+	public static final String ajuda = "/ajuda";
+	
 	/**
 	 * @param sendResponse
 	 * @param bot
@@ -21,8 +26,10 @@ public class Ajuda {
 		sendResponse = bot
 				.execute(new SendMessage(update.message().chat().id(),
 						"Digite um dos comandos: \n"
-						+ "Temperatura /tempo \n"
-					    + "Listar comandos /ajuda"));
+						+ "Listar comandos "    + ajuda + "\n"
+						+ "Temperatura Atual "  + tempo + "\n"
+						+ "Previsão para 8 dias " + previsao + "\n"		
+					    ));
 		
 	}
 	
