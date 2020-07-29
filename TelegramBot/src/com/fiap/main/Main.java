@@ -6,7 +6,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import com.fiap.chatControl.ChatControl;
 import com.fiap.comandos.Ajuda;
+import com.fiap.comandos.Love;
 import com.fiap.comandos.Tempo;
+import com.fiap.utils.UtilsBot;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
@@ -21,7 +23,7 @@ public class Main {
 
 	// Criação do objeto bot com as informações de acesso
 	// link para chat do bot criado https://t.me/FIAP36SCJBot
-	private static final TelegramBot bot = new TelegramBot("836335411:AAFAvWdyjL0c6_Su2ASzyQCksZMByVOiPek");
+	private static final TelegramBot bot = new TelegramBot("1274071003:AAEAGwhFcy0mve51-mEHNvA_80-EXiYxhTU");
 	static String mensagem;
 	static Long chatId;
 	static List<ChatControl> listChatControl = new ArrayList<ChatControl>();
@@ -90,7 +92,7 @@ public class Main {
 		String ultimaMensagem = chatControl.getUltima_mensagem();
 
 		if (ultimaMensagem == null) {
-			bemVindo(sendResponse, bot, update);
+			UtilsBot.bemVindo(sendResponse, bot, update);
 			return;
 		}
 
@@ -104,8 +106,12 @@ public class Main {
 			mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
 			break;
 
+		case Ajuda.combNomes:
+			mensagem = Love.obterPorcentagem(sendResponse, bot, update);
+			break;
+			
 		default:
-			bemVindo(sendResponse, bot, update);
+			UtilsBot.bemVindo(sendResponse, bot, update);
 		}
 
 //		Atualiza chat ID com nova mensagem
@@ -114,21 +120,7 @@ public class Main {
 
 	}
 
-	/**
-	 * Envia mensagem default de bem vindo
-	 * 
-	 * @param sendResponse
-	 * @param bot
-	 * @param update
-	 */
-	private static void bemVindo(SendResponse sendResponse, TelegramBot bot, Update update) {
-		sendResponse = bot.execute(new SendMessage(update.message().chat().id(),
-				"Bem vindo " + update.message().from().firstName() + " " + update.message().from().lastName()));
-
-		sendResponse = bot.execute(new SendMessage(update.message().chat().id(),
-				"digite /ajuda para obter a lista de comandos conhecidos."));
-
-	}
+	
 
 	/**
 	 * Verifica mensagem enviada
@@ -176,6 +168,10 @@ public class Main {
 			case Ajuda.previsao:
 				Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
 				break;
+				
+			case Ajuda.combNomes:
+				Love.solicitarNomes(sendResponse, bot, update, mensagem);
+				break;
 
 			default:
 				Ajuda.comandoInvalido(sendResponse, bot, update);
@@ -191,7 +187,7 @@ public class Main {
 			} else {
 
 				listChatControl.add(new ChatControl(chatId, mensagem));
-				bemVindo(sendResponse, bot, update);
+				UtilsBot.bemVindo(sendResponse, bot, update);
 
 			}
 

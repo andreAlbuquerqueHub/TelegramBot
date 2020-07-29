@@ -3,21 +3,14 @@ package com.fiap.chatControl;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
 @Data
 public class ChatControl {
 
-	@Getter
-	@Setter
 	private Long chatId;
-	@Getter
-	@Setter
 	private String ultima_mensagem;
-	@Getter
-	@Setter
 	private LocalDateTime data_mensagem;
 
 	/**

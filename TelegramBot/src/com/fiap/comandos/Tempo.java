@@ -33,7 +33,6 @@ public class Tempo {
 	/**
 	 * Solicita a localização em tempo real do usuario
 	 * 
-	 * 
 	 * @param sendResponse
 	 * @param bot
 	 * @param update

@@ -15,6 +15,7 @@ public class Ajuda {
 	public static final String previsao = "/previsao";
 	public static final String tempo = "/tempo";
 	public static final String ajuda = "/ajuda";
+	public static final String combNomes = "/love";
 	
 	/**
 	 * @param sendResponse
@@ -28,7 +29,8 @@ public class Ajuda {
 						"Digite um dos comandos: \n"
 						+ "Listar comandos "    + ajuda + "\n"
 						+ "Temperatura Atual "  + tempo + "\n"
-						+ "Previsão para 8 dias " + previsao + "\n"		
+						+ "Previsão para 8 dias " + previsao + "\n"	
+						+ "Calculadora do amor " + combNomes + "\n"	
 					    ));
 		
 	}
