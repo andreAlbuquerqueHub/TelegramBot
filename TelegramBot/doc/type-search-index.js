@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"com.fiap.comandos","l":"Ajuda"},{"p":"com.fiap.comandos","l":"CEP"},{"p":"com.fiap.chatControl","l":"ChatControl"},{"p":"com.fiap.bean","l":"Combinacao"},{"p":"com.fiap.bean","l":"EnderecoCompleto"},{"p":"com.fiap.comandos","l":"Love"},{"p":"com.fiap.main","l":"Main"},{"p":"com.fiap.comandos","l":"Tempo"},{"p":"com.fiap.utils","l":"UtilsBot"}]
