@@ -11,11 +11,11 @@ import com.pengrad.telegrambot.response.SendResponse;
  */
 public class Ajuda {
 
-	
 	public static final String previsao = "/previsao";
 	public static final String tempo = "/tempo";
 	public static final String ajuda = "/ajuda";
 	public static final String combNomes = "/love";
+	public static final String cep = "/cep";
 	
 	/**
 	 * @param sendResponse
@@ -30,7 +30,8 @@ public class Ajuda {
 						+ "Listar comandos "    + ajuda + "\n"
 						+ "Temperatura Atual "  + tempo + "\n"
 						+ "Previsão para 8 dias " + previsao + "\n"	
-						+ "Calculadora do amor " + combNomes + "\n"	
+						+ "Calculadora do amor " + combNomes + "\n"
+						+ "Endereço completo pelo CEP " + cep + "\n"	
 					    ));
 		
 	}

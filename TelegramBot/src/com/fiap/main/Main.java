@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
 import com.fiap.chatControl.ChatControl;
 import com.fiap.comandos.Ajuda;
+import com.fiap.comandos.CEP;
 import com.fiap.comandos.Love;
 import com.fiap.comandos.Tempo;
 import com.fiap.utils.UtilsBot;
@@ -14,7 +16,6 @@ import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.model.request.ChatAction;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.request.SendChatAction;
-import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.response.BaseResponse;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
 import com.pengrad.telegrambot.response.SendResponse;
@@ -23,7 +24,7 @@ public class Main {
 
 	// Criação do objeto bot com as informações de acesso
 	// link para chat do bot criado https://t.me/FIAP36SCJBot
-	private static final TelegramBot bot = new TelegramBot("1274071003:AAEAGwhFcy0mve51-mEHNvA_80-EXiYxhTU");
+	private static final TelegramBot bot = new TelegramBot("1353188459:AAGIfGmq7m_RR7pBceGQ7Yr5leNiC1HzMJY");
 	static String mensagem;
 	static Long chatId;
 	static List<ChatControl> listChatControl = new ArrayList<ChatControl>();
@@ -98,20 +99,24 @@ public class Main {
 
 		switch (ultimaMensagem) {
 
-		case Ajuda.tempo:
-			mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
-			break;
-
-		case Ajuda.previsao:
-			mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
-			break;
-
-		case Ajuda.combNomes:
-			mensagem = Love.obterPorcentagem(sendResponse, bot, update);
-			break;
-			
-		default:
-			UtilsBot.bemVindo(sendResponse, bot, update);
+			case Ajuda.tempo:
+				mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
+				break;
+	
+			case Ajuda.previsao:
+				mensagem = Tempo.solicitarLocalizacao(sendResponse, bot, update, ultimaMensagem);
+				break;
+	
+			case Ajuda.combNomes:
+				mensagem = Love.obterPorcentagem(sendResponse, bot, update);
+				break;
+				
+			case Ajuda.cep:
+				mensagem = CEP.obterEndereco(sendResponse, bot, update);
+				break;
+				
+			default:
+				UtilsBot.bemVindo(sendResponse, bot, update);
 		}
 
 //		Atualiza chat ID com nova mensagem
@@ -119,9 +124,7 @@ public class Main {
 		listChatControl.set(index, chatControl);
 
 	}
-
 	
-
 	/**
 	 * Verifica mensagem enviada
 	 * 
@@ -157,25 +160,29 @@ public class Main {
 //			Verifca o comando informado
 			switch (mensagem) {
 
-			case Ajuda.ajuda:
-				Ajuda.listarComandos(sendResponse, bot, update);
-				break;
-
-			case Ajuda.tempo:
-				Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
-				break;
-
-			case Ajuda.previsao:
-				Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
-				break;
-				
-			case Ajuda.combNomes:
-				Love.solicitarNomes(sendResponse, bot, update, mensagem);
-				break;
-
-			default:
-				Ajuda.comandoInvalido(sendResponse, bot, update);
-				break;
+				case Ajuda.ajuda:
+					Ajuda.listarComandos(sendResponse, bot, update);
+					break;
+	
+				case Ajuda.tempo:
+					Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
+					break;
+	
+				case Ajuda.previsao:
+					Tempo.solicitarLocalizacao(sendResponse, bot, update, mensagem);
+					break;
+					
+				case Ajuda.combNomes:
+					Love.solicitarNomes(sendResponse, bot, update, mensagem);
+					break;
+					
+				case Ajuda.cep:
+					CEP.solicitarCEP(sendResponse, bot, update, mensagem);
+					break;
+	
+				default:
+					Ajuda.comandoInvalido(sendResponse, bot, update);
+					break;
 			}
 
 		} else {
